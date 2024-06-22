@@ -2,7 +2,7 @@
 // @name         Facebook Photos Bulk Eagle
 // @name:zh      批次下载多張Facebook图片到Eagle
 // @namespace    https://github.com/aynmimoe/userscript-fb-photos-bulk-eagle
-// @version      0.7
+// @version      0.8
 // @description  請在Facebook單張圖片畫面中重新整理，會出現下載按鈕，再點下去輸入想匯入的張數，就會匯入進Eagle
 // @author       Aiyin Mi
 // @icon         https://cn.eagle.cool/favicon.png
@@ -21,8 +21,12 @@
 
 const ISNEXT = false;
 
+// 
 const SELECTOR_Author = 'body>div:nth-child(2)>div:nth-child(1)>div:nth-child(1)>div:nth-child(1)>div:nth-child(4)>div:nth-child(1)>div:nth-child(1)>div:nth-child(1)>div:nth-child(1)>div:nth-child(1)>div:nth-child(2)>div:nth-child(1)>div:nth-child(1)>div:nth-child(1)>div:nth-child(1)>div:nth-child(1)>div:nth-child(1)>div:nth-child(1)>div:nth-child(2)>div:nth-child(1)>div:nth-child(1)>span>div>h2';
+// 單張圖片的描述
 const SELECTOR_Annotation = 'body>div:nth-child(2)>div:nth-child(1)>div:nth-child(1)>div:nth-child(1)>div:nth-child(4)>div:nth-child(1)>div:nth-child(1)>div:nth-child(1)>div:nth-child(1)>div:nth-child(1)>div:nth-child(2)>div:nth-child(1)>div:nth-child(1)>div:nth-child(1)>div:nth-child(1)>div:nth-child(1)>div:nth-child(1)>div:nth-child(2)>span';
+// 此圖片來自一則貼文的描述（因為定位點有變，需要調整）
+const SELECTOR_Annotation_ON_POST = 'body>div:nth-child(2)>div:nth-child(1)>div:nth-child(1)>div:nth-child(1)>div:nth-child(4)>div:nth-child(1)>div:nth-child(1)>div:nth-child(1)>div:nth-child(1)>div:nth-child(1)>div:nth-child(2)>div:nth-child(1)>div:nth-child(1)>div:nth-child(1)>div:nth-child(1)>div:nth-child(3)>div:nth-child(1)>div:nth-child(2)>span';
 
 // Eagle API 服务器位置
 const EAGLE_SERVER_URL = "http://localhost:41595";
@@ -73,20 +77,28 @@ function getAuthor(){
 
 // 抓描述的第一行字
 function getTitle(){
-  let ele = document.querySelector(SELECTOR_Annotation);
+  let ele = document.querySelector(SELECTOR_Annotation_ON_POST);
+
+  if (ele === null) {
+    ele = document.querySelector(SELECTOR_Annotation);
+  }
 
   if(ele === null){
     return ele;
   }
   else {
-    let firstLine = document.querySelector(SELECTOR_Annotation).innerHTML.split("<br")[0];
+    let firstLine = ele.innerHTML.split("<br")[0];
     let text = firstLine.split("<br")[0].replace(/<[^>]+>/g, '');
     return text;
   }
 };
 
 function getAnnotation(){
-  let ele = document.querySelector(SELECTOR_Annotation);
+  let ele = document.querySelector(SELECTOR_Annotation_ON_POST);
+
+  if (ele === null) {
+    ele = document.querySelector(SELECTOR_Annotation);
+  }
 
   if(ele === null){
     return ele;
@@ -200,7 +212,11 @@ function nextImage(){
 function batchprocess(){
 
   // 如果有「查看更多」，就展開
-  let ele = document.querySelector(SELECTOR_Annotation);
+  let ele = document.querySelector(SELECTOR_Annotation_ON_POST);
+
+  if (ele === null) {
+    ele = document.querySelector(SELECTOR_Annotation);
+  }
   if(ele !== null){
     // 如果有「查看更多」就展開
     let ele_more = ele.querySelector('div[role~=button]');
