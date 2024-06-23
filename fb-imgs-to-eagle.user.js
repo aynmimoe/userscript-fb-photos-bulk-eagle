@@ -2,7 +2,7 @@
 // @name         Facebook Photos Bulk Eagle
 // @name:zh      批次下载多張Facebook图片到Eagle
 // @namespace    https://github.com/aynmimoe/userscript-fb-photos-bulk-eagle
-// @version      0.8
+// @version      0.9
 // @description  請在Facebook單張圖片畫面中重新整理，會出現下載按鈕，再點下去輸入想匯入的張數，就會匯入進Eagle
 // @author       Aiyin Mi
 // @icon         https://cn.eagle.cool/favicon.png
@@ -119,6 +119,23 @@ function getAnnotation(){
   }
 };
 
+function getTags() {
+  let ele = document.querySelector(SELECTOR_Annotation_ON_POST);
+
+  if (ele === null) {
+    ele = document.querySelector(SELECTOR_Annotation);
+  }
+
+  if(ele === null){
+    return [];
+  }
+
+  let links = ele.querySelectorAll('a');
+  let tags = Array.from(links).filter(item => item.textContent.charAt(0) === '#');
+  let tagTexts = tags.map(item => item.textContent.slice(1));
+  return tagTexts;
+}
+
 function getWebUrl(){
   return document.URL;
 };
@@ -163,6 +180,7 @@ function getCommonInfo(){
       "name": name,
       "annotation": annotation,
       "website": getWebUrl(),
+      "tags": getTags(),
       "headers": HEADERS
   };
 
